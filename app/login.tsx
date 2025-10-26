@@ -59,7 +59,10 @@ export default function Login() {
                         styles.button,
                         { backgroundColor: pressed ? "#3F51B5" : "navy"}
                     ]}
-                    onPress={() => ValidateLogin(form.usuario, form.password)}
+                    onPress={() => {
+                        ValidateLogin(form.usuario, form.password);
+                        router.push("/(tabs)");
+                    }}
                 >
                     <Text style={{color: 'white', fontSize: 18}}>Iniciar sesión</Text>
                 </Pressable>

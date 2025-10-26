@@ -1,91 +1,33 @@
-import { useState } from "react";
-import { Alert, useColorScheme, View, Text, Pressable, Image, StyleSheet } from "react-native";
-import { Colors } from "../../constants/Colors";
+import { useCart } from "@/hooks/use-cart";
+import { Pressable, StyleSheet, Text, useColorScheme, View, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-
-interface Producto {
-    id: number;
-    nombre: string;
-    descripcion: string;
-    precio: number;
-    imagen: any;
-}
+import { Colors } from "../../constants/Colors";
 
 export default function Carrito() {
     const colorScheme = useColorScheme();
     const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-
-    const [productos, setProductos] = useState<Producto[]>([
-        {
-            id: 1,
-            nombre: "Producto 1",
-            descripcion: "Descripción detallada del primer producto",
-            precio: 29.99,
-            imagen: require("@/assets/images/banner.png")
-        },
-        {
-            id: 2,
-            nombre: "Producto 2",
-            descripcion: "Descripción detallada del segundo producto",
-            precio: 45.50,
-            imagen: require("@/assets/images/banner.png")
-        },
-        {
-            id: 3,
-            nombre: "Producto 3",
-            descripcion: "Descripción detallada del tercer producto",
-            precio: 15.99,
-            imagen: require("@/assets/images/banner.png")
-        }
-    ]);
-
-    const eliminarProducto = (id: number) => {
-        Alert.alert(
-            "Eliminar producto",
-            "¿Estás seguro de que desear eliminar este producto del carrito?",
-            [
-                {
-                    text: "Cancelar",
-                    style: "cancel"
-                },
-                {
-                    text: "Esperar",
-                    style: "destructive"
-                },
-                {
-                    text: "Eliminar",
-                    style: "destructive",
-                    onPress: () => {
-                        setProductos(productos.filter(producto => producto.id !== id));
-                    }
-                }
-            ]
-        );
-    };
-
-    const calcularTotal = () => {
-        return productos.reduce((total, producto) => total + producto.precio, 0).toFixed(2);
-    };
+    const { cartProducts, removeFromCart, calculateTotal } = useCart();
 
     return (
         <ScrollView style={{ backgroundColor: colors.background }}>
             <View style={styles.ViewTop}>
                 <Text style={{ color: colors.text, fontSize: 52 }}>Carrito de compras</Text>
-                {productos.length > 0 && (
+                {cartProducts.length > 0 && (
                     <Text style={{ color: colors.text, fontSize: 18, marginTop: 10 }}>
-                        Total: ${calcularTotal()}
+                        Total: ${calculateTotal()}
                     </Text>
                 )}
             </View>
 
-            {productos.length === 0 ? (
+            {cartProducts.length === 0 ? (
                 <View style={styles.emptyCart}>
-                    <Text style={{ color: colors.text, fontSize: 18, textAlign: 'center' }}>
+                    <Text style={{ color: colors.text, fontSize: 18, textAlign: 'center' }}
+                    >
                         Tu carrito está vacío
                     </Text>
                 </View>
             ) : (
-                productos.map((producto) => (
+                cartProducts.map((producto) => (
                     <View key={producto.id} style={[styles.viewCard, { backgroundColor: colors.background }]}>
                         <View style={styles.imageContainer}>
                             <Image source={producto.imagen} style={styles.productImage} />
@@ -94,7 +36,7 @@ export default function Carrito() {
                             <Text style={[styles.productName, { color: colors.text }]}>
                                 {producto.nombre}
                             </Text>
-                            <Text style={[styles.productDescription, { color: colors.text}]}>
+                            <Text style={[styles.productDescription, { color: colors.text }]}>
                                 {producto.descripcion}
                             </Text>
                             <Text style={[styles.productPrice, { color: colors.text }]}>
@@ -103,11 +45,11 @@ export default function Carrito() {
 
                             <View style={styles.buttonContainer}>
                                 <Pressable
-                                    style={({pressed}) => [
+                                    style={({ pressed }) => [
                                         styles.buttonDelete,
-                                        { backgroundColor: pressed ? "#d32f2f" : "#f44336"}
+                                        { backgroundColor: pressed ? "#d32f2f" : "#f44336" }
                                     ]}
-                                    onPress={() => eliminarProducto(producto.id)}
+                                    onPress={() => removeFromCart(producto.id)}
                                 >
                                     <Text style={styles.deleteIcon}>🗑️</Text>
                                     <Text style={styles.buttonText}>Eliminar</Text>
